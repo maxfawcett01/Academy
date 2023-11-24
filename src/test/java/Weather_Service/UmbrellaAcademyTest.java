@@ -1,67 +1,142 @@
 package Weather_Service;
 
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.CsvSource;
-import org.mockito.Mockito;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import static org.mockito.Mockito.times;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
 
 class UmbrellaAcademyTest {
-
-    @ParameterizedTest
-    @CsvSource({"0.49, False", "0.50, False", "0.51, True"})
-    void test(double chanceOfRain, Boolean choice) {
-        FakeWeatherService fakeWeatherService = new FakeWeatherService();
-        UmbrellaAcademy umbrella = new UmbrellaAcademy(fakeWeatherService);
-        fakeWeatherService.setFakeRandom(chanceOfRain);
-        boolean actual = umbrella.shouldICarryAnUmbrella();
-        boolean expected = choice;
-        Assertions.assertEquals(expected, actual);
-    }
-
-    @ParameterizedTest
-    @CsvSource({"0.49, False", "0.50, False", "0.51, True"})
-    void testToFailMock(double chanceOfRain, Boolean choice) {
-        WeatherService mockWeatherService = Mockito.mock(WeatherService.class);
-        Mockito.when(mockWeatherService.getChanceOfRain()).thenReturn(chanceOfRain);
-
-        PublicServiceAnnouncement mockPsa = Mockito.mock(PublicServiceAnnouncement.class);
-        Mockito.when(mockPsa.getAnnouncement()).thenReturn("Fake Announcement");
-
-        UmbrellaAcademy umbrellaAcademy = new UmbrellaAcademy(mockWeatherService, mockPsa);
-        boolean actualResult = umbrellaAcademy.shouldICarryAnUmbrella();
-        boolean expected = choice;
-        Assertions.assertEquals(expected, actualResult);
-    }
-
-    @ParameterizedTest
-    @CsvSource({"0.74, False", "0.75, False", "0.76, True"})
-    void testPublicServiceAnnouncement(double chanceOfRain, Boolean expected) {
-        WeatherService mockWeatherService = Mockito.mock(WeatherService.class);
-        Mockito.when(mockWeatherService.getChanceOfRain()).thenReturn(chanceOfRain);
-
-        PublicServiceAnnouncement mockPsa = Mockito.mock(PublicServiceAnnouncement.class);
-        Mockito.when(mockPsa.getAnnouncement()).thenReturn("Fake Announcement");
-
-        UmbrellaAcademy umbrellaAcademy = new UmbrellaAcademy(mockWeatherService, mockPsa);
-        boolean actualResult = umbrellaAcademy.isThereAnAnnouncement();
-        Assertions.assertEquals(expected, actualResult);
-    }
-
+    /**
+     * Method under test: {@link UmbrellaAcademy#UmbrellaAcademy(WeatherServiceInterface)}
+     */
     @Test
-    void testSetAnnouncementIsCalled() {
-        WeatherService mockWeatherService = Mockito.mock(WeatherService.class);
-        Mockito.when(mockWeatherService.getChanceOfRain()).thenReturn(0.76);
+    void testConstructor() {
+        // Arrange and Act
+        UmbrellaAcademy actualUmbrellaAcademy = new UmbrellaAcademy(new FakeWeatherService());
 
-        PublicServiceAnnouncement mockPsa = Mockito.mock(PublicServiceAnnouncement.class);
-        Mockito.when(mockPsa.getAnnouncement()).thenReturn("Fake Announcement");
+        // Assert
+        assertNull(actualUmbrellaAcademy.publicServiceAnnouncement);
+        WeatherServiceInterface weatherServiceInterface = actualUmbrellaAcademy.service;
+        assertTrue(weatherServiceInterface instanceof FakeWeatherService);
+        assertEquals(0.0d, weatherServiceInterface.getChanceOfRain());
+    }
 
-        UmbrellaAcademy umbrellaAcademy = new UmbrellaAcademy(mockWeatherService, mockPsa);
-        umbrellaAcademy.isThereAnAnnouncement();
+    /**
+     * Method under test: {@link UmbrellaAcademy#UmbrellaAcademy(WeatherServiceInterface, PublicServiceAnnouncement)}
+     */
+    @Test
+    void testConstructor2() {
+        // Arrange
+        FakeWeatherService service = new FakeWeatherService();
 
-        Mockito.verify(mockPsa, times(1)).setAnnouncement(UmbrellaAcademy.CARRY_AN_UMBRELLA);
-        Mockito.verify(mockPsa, times(1)).getAnnouncement();
+        PublicServiceAnnouncement publicServiceAnnouncement = new PublicServiceAnnouncement();
+        publicServiceAnnouncement.setAnnouncement("Announcement");
+
+        // Act and Assert
+        assertEquals("Announcement",
+                (new UmbrellaAcademy(service, publicServiceAnnouncement)).publicServiceAnnouncement.getAnnouncement());
+    }
+
+    /**
+     * Method under test: {@link UmbrellaAcademy#shouldICarryAnUmbrella()}
+     */
+    @Test
+    void testShouldICarryAnUmbrella() {
+        // Arrange, Act and Assert
+        assertFalse((new UmbrellaAcademy(new FakeWeatherService())).shouldICarryAnUmbrella());
+    }
+
+    /**
+     * Method under test: {@link UmbrellaAcademy#shouldICarryAnUmbrella()}
+     */
+    @Test
+    @Disabled("TODO: Complete this test")
+    void testShouldICarryAnUmbrella2() {
+        // TODO: Complete this test.
+        //   Reason: R013 No inputs found that don't throw a trivial exception.
+        //   Diffblue Cover tried to run the arrange/act section, but the method under
+        //   test threw
+        //   java.lang.NullPointerException: Cannot invoke "Weather_Service.WeatherServiceInterface.getChanceOfRain()" because "this.service" is null
+        //       at Weather_Service.UmbrellaAcademy.shouldICarryAnUmbrella(UmbrellaAcademy.java:21)
+        //   See https://diff.blue/R013 to resolve this issue.
+
+        // Arrange and Act
+        (new UmbrellaAcademy(null)).shouldICarryAnUmbrella();
+    }
+
+    /**
+     * Method under test: {@link UmbrellaAcademy#shouldICarryAnUmbrella()}
+     */
+    @Test
+    void testShouldICarryAnUmbrella3() {
+        // TODO: Complete this test.
+        //   Diffblue AI was unable to find a test
+
+        // Arrange and Act
+        (new UmbrellaAcademy(new WeatherService())).shouldICarryAnUmbrella();
+    }
+
+    /**
+     * Method under test: {@link UmbrellaAcademy#isThereAnAnnouncement()}
+     */
+    @Test
+    void testIsThereAnAnnouncement() {
+        // Arrange, Act and Assert
+        assertFalse((new UmbrellaAcademy(new FakeWeatherService())).isThereAnAnnouncement());
+    }
+
+    /**
+     * Method under test: {@link UmbrellaAcademy#isThereAnAnnouncement()}
+     */
+    @Test
+    @Disabled("TODO: Complete this test")
+    void testIsThereAnAnnouncement2() {
+        // TODO: Complete this test.
+        //   Reason: R013 No inputs found that don't throw a trivial exception.
+        //   Diffblue Cover tried to run the arrange/act section, but the method under
+        //   test threw
+        //   java.lang.NullPointerException: Cannot invoke "Weather_Service.WeatherServiceInterface.getChanceOfRain()" because "this.service" is null
+        //       at Weather_Service.UmbrellaAcademy.isThereAnAnnouncement(UmbrellaAcademy.java:25)
+        //   See https://diff.blue/R013 to resolve this issue.
+
+        // Arrange and Act
+        (new UmbrellaAcademy(null)).isThereAnAnnouncement();
+    }
+
+    /**
+     * Method under test: {@link UmbrellaAcademy#isThereAnAnnouncement()}
+     */
+    @Test
+    void testIsThereAnAnnouncement3() {
+        // TODO: Complete this test.
+        //   Diffblue AI was unable to find a test
+
+        // Arrange
+        WeatherService service = new WeatherService();
+
+        // Act
+        (new UmbrellaAcademy(service, new PublicServiceAnnouncement())).isThereAnAnnouncement();
+    }
+
+    /**
+     * Method under test: {@link UmbrellaAcademy#isThereAnAnnouncement()}
+     */
+    @Test
+    @Disabled("TODO: Complete this test")
+    void testIsThereAnAnnouncement4() {
+        // TODO: Complete this test.
+        //   Reason: R013 No inputs found that don't throw a trivial exception.
+        //   Diffblue Cover tried to run the arrange/act section, but the method under
+        //   test threw
+        //   java.lang.NullPointerException: Cannot invoke "Weather_Service.PublicServiceAnnouncement.setAnnouncement(String)" because "this.publicServiceAnnouncement" is null
+        //       at Weather_Service.UmbrellaAcademy.isThereAnAnnouncement(UmbrellaAcademy.java:27)
+        //   See https://diff.blue/R013 to resolve this issue.
+
+        // Arrange and Act
+        (new UmbrellaAcademy(new WeatherService(), null)).isThereAnAnnouncement();
     }
 }
+
