@@ -1,10 +1,5 @@
 pipeline {
-    agent {
-        docker {
-            image 'maven:3.9.5-eclipse-temurin-17-alpine'
-            args '-v /root/.m2:/root/.m2'
-        }
-    }
+    agent any
     options {
         skipStagesAfterUnstable()
     }
@@ -24,25 +19,14 @@ pipeline {
                 }
             }
         }
-        stage('OWASP Dependency-Check Vulnerabilities') {
-            agent {
-                docker {
-                    image 'docker:dind'
-                    args '-v /var/run/docker.sock:/var/run/docker.sock'
-                }
-            }
+        stage ('OWASP Dependency-Check Vulnerabilities') {
             steps {
-                script {
-                    // Adjust the path to the Dependency-Check script as needed
-                    sh '/var/jenkins_home/tools/org.jenkinsci.plugins.DependencyCheck.tools.DependencyCheckInstallation/dependency-check/bin/dependency-check.sh' + 
-                       ' --out "./" --scan "./" --format "ALL" --prettyPrint'
-                }
-            }
-            post {
-                always {
-                    // You might need to adjust the path to the report file based on Dependency-Check configuration
-                    junit 'dependency-check-report.xml'
-                }
+                dependencyCheck additionalArguments: '''
+                    --out "./"
+                    --scan "./"
+                    --format "ALL"
+                    --prettyPrint''', odcInstallation: 'dependency-check'
+                dependencyCheckPublisher pattern: 'dependency-check-report.xml'
             }
         }
         stage('SonarQube Analysis') {
