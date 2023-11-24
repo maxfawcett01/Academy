@@ -27,9 +27,9 @@ pipeline {
         stage ('OWASP Dependency-Check Vulnerabilities') {
             steps {
                 dependencyCheck additionalArguments: '''
-                    -o "./"
-                    -s "./"
-                    -f "ALL"
+                    --out "./"
+                    --scan "./"
+                    --format "ALL"
                     --prettyPrint''', odcInstallation: 'dependency-check'
                 dependencyCheckPublisher pattern: 'dependency-check-report.xml'
             }
