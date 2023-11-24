@@ -24,14 +24,24 @@ pipeline {
                 }
             }
         }
-        stage ('OWASP Dependency-Check Vulnerabilities') {
+        stage('OWASP Dependency-Check Vulnerabilities') {
+            agent {
+                docker {
+                    label 'jenkins-docker'
+                }
+            }
             steps {
-                dependencyCheck additionalArguments: '''
-                    --out "./"
-                    --scan "./"
-                    --format "ALL"
-                    --prettyPrint''', odcInstallation: 'dependency-check'
-                dependencyCheckPublisher pattern: 'dependency-check-report.xml'
+                script {
+                    // Adjust the path to the Dependency-Check script as needed
+                    sh '/var/jenkins_home/tools/org.jenkinsci.plugins.DependencyCheck.tools.DependencyCheckInstallation/dependency-check/bin/dependency-check.sh' + 
+                       ' --out "./" --scan "./" --format "ALL" --prettyPrint'
+                }
+            }
+            post {
+                always {
+                    // You might need to adjust the path to the report file based on Dependency-Check configuration
+                    junit 'dependency-check-report.xml'
+                }
             }
         }
         stage('SonarQube Analysis') {
